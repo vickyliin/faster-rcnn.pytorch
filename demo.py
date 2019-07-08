@@ -23,7 +23,7 @@ import torch.optim as optim
 
 import torchvision.transforms as transforms
 import torchvision.datasets as dset
-from scipy.misc import imread
+from PIL import Image
 from roi_data_layer.roidb import combined_roidb
 from roi_data_layer.roibatchLoader import roibatchLoader
 from model.utils.config import cfg, cfg_from_file, cfg_from_list, get_output_dir
@@ -217,10 +217,10 @@ if __name__ == '__main__':
     gt_boxes = gt_boxes.cuda()
 
   # make variable
-  im_data = Variable(im_data, volatile=True)
-  im_info = Variable(im_info, volatile=True)
-  num_boxes = Variable(num_boxes, volatile=True)
-  gt_boxes = Variable(gt_boxes, volatile=True)
+  # im_data = Variable(im_data, volatile=True)
+  # im_info = Variable(im_info, volatile=True)
+  # num_boxes = Variable(num_boxes, volatile=True)
+  # gt_boxes = Variable(gt_boxes, volatile=True)
 
   if args.cuda > 0:
     cfg.CUDA = True
@@ -262,7 +262,7 @@ if __name__ == '__main__':
       else:
         im_file = os.path.join(args.image_dir, imglist[num_images])
         # im = cv2.imread(im_file)
-        im_in = np.array(imread(im_file))
+        im_in = np.asarray(Image.open(im_file))
       if len(im_in.shape) == 2:
         im_in = im_in[:,:,np.newaxis]
         im_in = np.concatenate((im_in,im_in,im_in), axis=2)
@@ -343,7 +343,7 @@ if __name__ == '__main__':
               cls_boxes = pred_boxes[inds, :]
             else:
               cls_boxes = pred_boxes[inds][:, j * 4:(j + 1) * 4]
-            
+
             cls_dets = torch.cat((cls_boxes, cls_scores.unsqueeze(1)), 1)
             # cls_dets = torch.cat((cls_boxes, cls_scores), 1)
             cls_dets = cls_dets[order]
